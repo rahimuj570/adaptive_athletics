@@ -155,6 +155,7 @@ class NetworkCallerService {
   Future<NetworkResponseModel> patchCall(
     String uri,
     Map<String, dynamic> body,
+    bool isAuthRequired,
   ) {
     return _request(method: 'PATCH', uri: uri, body: body);
   }
@@ -162,6 +163,7 @@ class NetworkCallerService {
   Future<NetworkResponseModel> deleteCall(
     String uri,
     Map<String, dynamic>? body,
+    bool isAuthRequired,
   ) {
     return _request(method: 'DELETE', uri: uri, body: body);
   }

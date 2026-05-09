@@ -18,4 +18,5 @@ class BaseUrl {
 
   static const String postEvent = '$baseUrl/events/';
   static const String getEventList = '$baseUrl/events/';
+  static String deleteEvent(String id) => '$baseUrl/events/$id';
 }

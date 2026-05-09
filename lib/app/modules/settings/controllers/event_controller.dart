@@ -126,5 +126,16 @@ class EventController extends GetxController {
     isLoading.value = false;
   }
 
-  void deleteEvent(String id) {}
+  Future<void> deleteEvent(String id) async {
+    isLoading.value = true;
+    NetworkResponseModel responseModel = await getNetworkCaller().deleteCall(
+      '${BaseUrl.deleteEvent(id)}/',
+      null,
+      true,
+    );
+    if (responseModel.isSuccess) {
+      events.removeWhere((e) => e.id == id);
+    }
+    isLoading.value = false;
+  }
 }
