@@ -3,19 +3,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
+import 'package:newproject/app/modules/settings/controllers/event_controller.dart';
 
 import '../../../../res/assets/image_assets.dart';
 import '../../../../res/colors/app_color.dart';
 import '../../../../widgets/custom_dropdown.dart';
 import '../../../../widgets/custom_input_widget.dart';
-import '../controllers/settings_controller.dart';
 
 class AddEventView extends StatelessWidget {
   const AddEventView({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final SettingsController c = Get.find();
+    final EventController c = Get.put(EventController());
 
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
@@ -89,21 +89,29 @@ class AddEventView extends StatelessWidget {
                       ),
                       borderRadius: BorderRadius.circular(30.r),
                     ),
-                    child: ElevatedButton(
-                      onPressed: c.addEvent,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.transparent,
-                        shadowColor: Colors.transparent,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(30.r),
+                    child: Obx(
+                      () => Visibility(
+                        visible: c.isLoading == false.obs,
+                        replacement: Center(
+                          child: CircularProgressIndicator(color: Colors.white),
                         ),
-                      ),
-                      child:  Text(
-                        'Save Goal',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16.sp,
-                          fontWeight: FontWeight.w600,
+                        child: ElevatedButton(
+                          onPressed: c.addEvent,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.transparent,
+                            shadowColor: Colors.transparent,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(30.r),
+                            ),
+                          ),
+                          child: Text(
+                            'Save Goal',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 16.sp,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
                         ),
                       ),
                     ),
@@ -118,7 +126,7 @@ class AddEventView extends StatelessWidget {
                   child: OutlinedButton(
                     onPressed: () => Get.back(),
                     style: OutlinedButton.styleFrom(
-                      side:  BorderSide(
+                      side: BorderSide(
                         color: AppColor.linearColor,
                         width: 1.5.w,
                       ),
@@ -126,7 +134,7 @@ class AddEventView extends StatelessWidget {
                         borderRadius: BorderRadius.circular(30.r),
                       ),
                     ),
-                    child:Text(
+                    child: Text(
                       'Cancel',
                       style: TextStyle(
                         color: AppColor.linearColor,
@@ -187,7 +195,7 @@ class AddEventView extends StatelessWidget {
     );
   }
 
-  Future<void> _pickDate(BuildContext context, SettingsController c) async {
+  Future<void> _pickDate(BuildContext context, EventController c) async {
     // 1. Create a "now" timestamp to use for both min and initial comparison
     final DateTime now = DateTime.now();
 

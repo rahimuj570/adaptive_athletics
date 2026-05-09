@@ -15,4 +15,7 @@ class BaseUrl {
 
   static const String postPlan = '$baseUrl/plans/';
   static const String getPlan = '$baseUrl/plans/';
+
+  static const String postEvent = '$baseUrl/events/';
+  static const String getEventList = '$baseUrl/plans/';
 }
