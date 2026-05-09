@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:newproject/app/modules/settings/models/event_request_model.dart';
+import 'package:newproject/app/modules/settings/models/event_response_model.dart';
 import 'package:newproject/app/services/base_url/urls.dart';
 import 'package:newproject/app/services/network_response_model.dart';
 import 'package:newproject/app/setup_network_caller.dart';
@@ -26,7 +27,7 @@ class EventController extends GetxController {
     '50.0',
     '100.0',
   ].obs;
-  final RxList<EventRequestModel> events = <EventRequestModel>[].obs;
+  final RxList<EventResponseModel> events = <EventResponseModel>[].obs;
   final RxString selectedSport = 'Cycling'.obs;
   final Rx<DateTime> selectedDate = DateTime.now().obs;
   final RxString selectedDistance = '1.0'.obs;
@@ -57,6 +58,7 @@ class EventController extends GetxController {
       name: name,
       sportType: selectedSport.value,
       scheduledDate: selectedDate.value,
+      distanceKm: double.parse(selectedDistance.value),
     );
 
     NetworkResponseModel responseModel = await getNetworkCaller().postCall(
@@ -110,4 +112,19 @@ class EventController extends GetxController {
     final now = DateTime.now();
     return d.year == now.year && d.month == now.month && d.day == now.day;
   }
+
+  Future<void> fetchEventList() async {
+    isLoading.value = true;
+    NetworkResponseModel responseModel = await getNetworkCaller().getCall(
+      BaseUrl.getEventList,
+    );
+    if (responseModel.isSuccess) {
+      events.value = (responseModel.responseData['data'] as List)
+          .map((e) => EventResponseModel.fromJson(e))
+          .toList();
+    }
+    isLoading.value = false;
+  }
+
+  void deleteEvent(String id) {}
 }

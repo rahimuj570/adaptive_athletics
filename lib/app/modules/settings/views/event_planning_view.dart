@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
+import 'package:newproject/app/modules/settings/controllers/event_controller.dart';
+import 'package:newproject/app/modules/settings/models/event_response_model.dart';
 import 'package:newproject/res/assets/image_assets.dart';
 
 import '../../../../res/colors/app_color.dart';
@@ -14,8 +17,8 @@ class EventPlanningView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final SettingsController c = Get.find();
-
+    final EventController c = Get.put(EventController());
+    c.fetchEventList();
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: _buildAppBar(context),
@@ -108,7 +111,7 @@ class EventPlanningView extends StatelessWidget {
       leading: GestureDetector(
         onTap: () => Navigator.pop(context),
         child: Container(
-          margin: EdgeInsets.only(left: 16.w,top: 5.h,bottom: 5.h),
+          margin: EdgeInsets.only(left: 16.w, top: 5.h, bottom: 5.h),
           decoration: BoxDecoration(
             color: AppColor.bgBlackColor,
             borderRadius: BorderRadius.circular(10.r),
@@ -143,8 +146,8 @@ class EventPlanningView extends StatelessWidget {
 }
 
 class _EventItem extends StatelessWidget {
-  final EventModel event;
-  final SettingsController controller;
+  final EventResponseModel event;
+  final EventController controller;
 
   const _EventItem({required this.event, required this.controller});
 
@@ -166,7 +169,7 @@ class _EventItem extends StatelessWidget {
               borderRadius: BorderRadius.circular(8.r),
             ),
             child: Icon(
-              _sportIcon(event.sport),
+              _sportIcon(event.sportType ?? ''),
               color: const Color(0xFF51A2FF),
               size: 22.r,
             ),
@@ -177,7 +180,7 @@ class _EventItem extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  event.eventName,
+                  event.name,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
@@ -190,7 +193,7 @@ class _EventItem extends StatelessWidget {
                 Row(
                   children: [
                     Text(
-                      event.formattedDate,
+                      DateFormat('E, MMM d - h a').format(event.scheduledDate),
                       style: TextStyle(
                         color: const Color(0xFF8E8E93),
                         fontSize: 12.sp,
@@ -208,7 +211,7 @@ class _EventItem extends StatelessWidget {
                     ),
                     SizedBox(width: 8.w),
                     Text(
-                      '${event.distanceKm % 1 == 0 ? event.distanceKm.toInt() : event.distanceKm} km',
+                      '${(event.distanceKm ?? 1) % 1 == 0 ? event.distanceKm ?? 1.toInt() : event.distanceKm} km',
                       style: TextStyle(
                         color: AppColor.linearColor,
                         fontSize: 12.sp,
@@ -231,10 +234,7 @@ class _EventItem extends StatelessWidget {
               ),
               child: SvgPicture.asset(
                 ImageAssets.delete,
-                colorFilter: ColorFilter.mode(
-                  Colors.red,
-                  BlendMode.srcIn,
-                ),
+                colorFilter: ColorFilter.mode(Colors.red, BlendMode.srcIn),
               ),
             ),
           ),
@@ -274,7 +274,7 @@ class _EventItem extends StatelessWidget {
           ),
         ),
         content: Text(
-          'Remove "${event.eventName}" from your goals?',
+          'Remove "${event.name}" from your goals?',
           style: TextStyle(color: const Color(0xFF8E8E93), fontSize: 14.sp),
         ),
         actions: [
