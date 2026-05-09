@@ -23,14 +23,15 @@ class _SplashScreenState extends State<SplashScreen> {
   void navigateTogetSTarted() async {
     // Navigate after 2 seconds
     await Future.delayed(const Duration(seconds: 3), () async {
-      // if (await AuthPrefsService().getToken() == null ||
-      //     await AuthPrefsService().getRememberMe() == false) {
-      Get.off(
-        () => const SplashView(),
-      ); // Replace HomePage with your target page
-      // } else {
-      //   Get.off(() => const Navbar());
-      // }
+      if (await AuthPrefsService().getToken() == null ||
+          await AuthPrefsService().getRememberMe() == false) {
+        Get.off(
+          () => const SplashView(),
+        ); // Replace HomePage with your target page
+      } else {
+        debugPrint('Token: ${await AuthPrefsService().getToken()}');
+        Get.off(() => const Navbar());
+      }
     });
   }
 

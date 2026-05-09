@@ -2,18 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
+import 'package:newproject/app/modules/plan/controllers/plan_view_controller.dart';
 
 import '../../../../res/assets/image_assets.dart';
 import '../../../../res/colors/app_color.dart';
 import '../../../../widgets/background.dart';
-import '../controllers/plan_controller.dart';
 import 'add_plan_view.dart';
 
-class PlanView extends GetView<PlanController> {
+class PlanView extends StatelessWidget {
   const PlanView({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final PlanViewController planViewController = Get.put(PlanViewController());
+    planViewController.fetchPlans();
     return Scaffold(
       backgroundColor: AppColor.backgroundColor,
       body: SafeArea(
@@ -30,10 +32,10 @@ class PlanView extends GetView<PlanController> {
 
                   Expanded(
                     child: Obx(() {
-                      if (controller.planList.isEmpty) {
+                      if (planViewController.plans.isEmpty) {
                         return _buildEmptyState();
                       }
-                      return _buildPlanList();
+                      return _buildPlanList(planViewController);
                     }),
                   ),
                 ],
@@ -58,7 +60,11 @@ class PlanView extends GetView<PlanController> {
                         borderRadius: BorderRadius.circular(100.r),
                       ),
                     ),
-                    child: Icon(Icons.add, size: 24.r, color: AppColor.whiteColor),
+                    child: Icon(
+                      Icons.add,
+                      size: 24.r,
+                      color: AppColor.whiteColor,
+                    ),
                   ),
                 ),
               ),
@@ -107,7 +113,7 @@ class PlanView extends GetView<PlanController> {
     );
   }
 
-  Widget _buildPlanList() {
+  Widget _buildPlanList(PlanViewController planViewController) {
     return ListView.separated(
       padding: EdgeInsets.only(
         left: 16.w,
@@ -115,11 +121,14 @@ class PlanView extends GetView<PlanController> {
         right: 16.w,
         top: 20.h,
       ),
-      itemCount: controller.planList.length,
+      itemCount: planViewController.plans.length,
       separatorBuilder: (context, index) => SizedBox(height: 16.h),
       itemBuilder: (context, index) {
-        final plan = controller.planList[index];
-        return _comingUp(plan['title'] ?? '', plan['subtitle'] ?? '');
+        final plan = planViewController.plans[index];
+        return _comingUp(
+          plan.name,
+          planViewController.convertDate(plan.startDate.toString()),
+        );
       },
     );
   }
@@ -183,9 +192,7 @@ class PlanView extends GetView<PlanController> {
                     Text(
                       subtitle,
                       style: TextStyle(
-                        color: const Color(
-                          0xFF9E9E9E,
-                        ), 
+                        color: const Color(0xFF9E9E9E),
                         fontSize: 12.sp,
                         fontFamily: 'Roboto',
                         fontWeight: FontWeight.w400,
@@ -195,10 +202,7 @@ class PlanView extends GetView<PlanController> {
                   ],
                 ),
               ),
-              SvgPicture.asset(
-                ImageAssets.coming,
-                width: 24.w, 
-              ),
+              SvgPicture.asset(ImageAssets.coming, width: 24.w),
             ],
           ),
         ),
@@ -231,7 +235,7 @@ class PlanView extends GetView<PlanController> {
               ),
               SizedBox(width: 8.w),
               SvgPicture.asset(
-                ImageAssets.see, 
+                ImageAssets.see,
                 width: 14.w,
                 height: 14.h,
                 colorFilter: const ColorFilter.mode(
