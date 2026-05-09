@@ -117,6 +117,7 @@ class EventController extends GetxController {
     isLoading.value = true;
     NetworkResponseModel responseModel = await getNetworkCaller().getCall(
       BaseUrl.getEventList,
+      true,
     );
     if (responseModel.isSuccess) {
       events.value = (responseModel.responseData['data'] as List)

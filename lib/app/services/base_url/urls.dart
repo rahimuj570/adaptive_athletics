@@ -5,6 +5,7 @@ class BaseUrl {
   static const String registerUrl = '$baseUrl/auth/register/';
   static const String sentEmailForgotPassword =
       '$baseUrl/auth/password/forgot/';
+  static const String updateUser = '$baseUrl/auth/profile/update/';
 
   static const String authPasswordVerify = '$baseUrl/auth/password/verify/';
   static const String passwordReset = '$baseUrl/auth/password/reset/';
@@ -19,4 +20,6 @@ class BaseUrl {
   static const String postEvent = '$baseUrl/events/';
   static const String getEventList = '$baseUrl/events/';
   static String deleteEvent(String id) => '$baseUrl/events/$id';
+
+  static String getCalendarData = '$baseUrl/calendar/';
 }

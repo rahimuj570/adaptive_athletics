@@ -13,6 +13,7 @@ class TermsAndConditionViewController extends GetxController {
     isLoading = true.obs;
     NetworkResponseModel responseModel = await getNetworkCaller().getCall(
       BaseUrl.getTerms,
+      true,
     );
     if (responseModel.isSuccess) {
       privacyContent.value = responseModel.responseData['data']['content'];

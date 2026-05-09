@@ -12,6 +12,7 @@ class PrivacyController {
     isLoading = true.obs;
     NetworkResponseModel responseModel = await getNetworkCaller().getCall(
       BaseUrl.getPolicy,
+      true,
     );
     if (responseModel.isSuccess) {
       privacyContent.value = responseModel.responseData['data']['content'];

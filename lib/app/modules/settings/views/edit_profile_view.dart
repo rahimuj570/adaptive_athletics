@@ -1,6 +1,11 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:newproject/app/modules/settings/controllers/edit_profile_controller.dart';
 
 import '../../../../res/colors/app_color.dart';
 import '../../../../widgets/custom_button.dart';
@@ -11,7 +16,19 @@ class EditProfileView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Future<String?> pickImageAsBase64() async {
+      final ImagePicker picker = ImagePicker();
+      final XFile? image = await picker.pickImage(source: ImageSource.gallery);
 
+      if (image == null) return null;
+
+      final bytes = await File(image.path).readAsBytes();
+      return base64Encode(bytes); // <-- convert to Base64
+    }
+
+    EditProfileController editProfileController = Get.put(
+      EditProfileController(),
+    );
     return GestureDetector(
       onTap: () => FocusScope.of(context).unfocus(),
       child: Scaffold(
@@ -26,19 +43,40 @@ class EditProfileView extends StatelessWidget {
                 SizedBox(height: 32.h),
                 Stack(
                   children: [
-                    Container(
-                      width: 110.w,
-                      height: 110.h,
-                      decoration: ShapeDecoration(
-                        image: DecorationImage(
-                          image: AssetImage('assets/image/img.png'),
-                          fit: BoxFit.cover,
-                        ),
-                        shape: OvalBorder(
-                          side: BorderSide(
-                            width: 2,
-                            strokeAlign: BorderSide.strokeAlignOutside,
-                            color: AppColor.textAreaColor,
+                    GestureDetector(
+                      onTap: () async {
+                        final base64Image = await pickImageAsBase64();
+                        if (base64Image != null) {
+                          editProfileController.base64Image.value = base64Image;
+                        }
+                      },
+                      child: Obx(
+                        () => Container(
+                          width: 110.w,
+                          height: 110.h,
+                          decoration: ShapeDecoration(
+                            image: DecorationImage(
+                              image:
+                                  editProfileController.base64Image != null &&
+                                      editProfileController
+                                          .base64Image!
+                                          .isNotEmpty
+                                  ? MemoryImage(
+                                      base64Decode(
+                                        editProfileController.base64Image.value,
+                                      ),
+                                    )
+                                  : const AssetImage('assets/image/img.png')
+                                        as ImageProvider,
+                              fit: BoxFit.cover,
+                            ),
+                            shape: OvalBorder(
+                              side: BorderSide(
+                                width: 2,
+                                strokeAlign: BorderSide.strokeAlignOutside,
+                                color: AppColor.textAreaColor,
+                              ),
+                            ),
                           ),
                         ),
                       ),
@@ -90,19 +128,41 @@ class EditProfileView extends StatelessWidget {
                   ],
                 ),
                 SizedBox(height: 32.h),
-                _header('Name'),
+                _header('Full Name'),
                 SizedBox(height: 12.h),
-                CustomInputWidget(onChanged: (onChanged) {}),
+                CustomInputWidget(
+                  onChanged: (onChanged) {},
+                  textEditingController:
+                      editProfileController.fullNameController,
+                ),
                 SizedBox(height: 16.h),
-                _header('Email'),
+                _header('Phone'),
                 SizedBox(height: 12.h),
-                CustomInputWidget(onChanged: (onChanged) {}),
+                CustomInputWidget(
+                  onChanged: (onChanged) {},
+                  textEditingController: editProfileController.phoneController,
+                ),
                 SizedBox(height: 16.h),
-                _header('Location'),
+                _header('Address'),
                 SizedBox(height: 12.h),
-                CustomInputWidget(onChanged: (onChanged) {}),
+                CustomInputWidget(
+                  onChanged: (onChanged) {},
+                  textEditingController:
+                      editProfileController.addressController,
+                ),
                 SizedBox(height: 140.h),
-                CustomButton(onPress: () async {}, title: 'Confirm'),
+                Obx(
+                  () => Visibility(
+                    visible: editProfileController.isLoading.value == false,
+                    replacement: Center(child: CircularProgressIndicator()),
+                    child: CustomButton(
+                      onPress: () async {
+                        editProfileController.updateUser();
+                      },
+                      title: 'Confirm',
+                    ),
+                  ),
+                ),
               ],
             ),
           ),
@@ -119,7 +179,7 @@ class EditProfileView extends StatelessWidget {
       leading: GestureDetector(
         onTap: () => Navigator.pop(context),
         child: Container(
-          margin: EdgeInsets.only(left: 16.w,top: 5.h,bottom: 5.h),
+          margin: EdgeInsets.only(left: 16.w, top: 5.h, bottom: 5.h),
           decoration: BoxDecoration(
             color: AppColor.bgBlackColor,
             borderRadius: BorderRadius.circular(10.r),

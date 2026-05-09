@@ -15,6 +15,7 @@ class PlanViewController extends GetxController {
     isFetching.value = true;
     NetworkResponseModel responseModel = await getNetworkCaller().getCall(
       BaseUrl.getPlan,
+      true,
     );
     if (responseModel.isSuccess) {
       plans.value = (responseModel.responseData['data'] as List)

@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:get/get.dart';
+import 'package:newproject/app/modules/auth/controllers/user_controller.dart';
+import 'package:newproject/app/modules/auth/models/login_response_model.dart';
+import 'package:newproject/app/modules/auth/services/auth_prefs_service.dart';
 import 'package:newproject/app/modules/auth/views/splash_view.dart';
 import '../../../../res/assets/image_assets.dart';
 import '../../../../res/colors/app_color.dart';
-import '../controllers/settings_controller.dart';
 import 'edit_profile_view.dart';
 import 'event_planning_view.dart';
 import 'membership_view.dart';
@@ -16,10 +18,12 @@ import 'terms_and_condition_view.dart';
 import 'unit_view.dart';
 import 'weather_preference.dart';
 
-class SettingsView extends GetView<SettingsController> {
+class SettingsView extends StatelessWidget {
   const SettingsView({super.key});
   @override
   Widget build(BuildContext context) {
+    UserController userController = Get.put(UserController());
+    userController.getUser();
     return Scaffold(
       backgroundColor: AppColor.backgroundColor,
 
@@ -98,28 +102,32 @@ class SettingsView extends GetView<SettingsController> {
                 SizedBox(height: 20.h),
                 SizedBox(
                   width: 200.w,
-                  child: Text(
-                    'Alice Johnson',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: AppColor.textColor,
-                      fontSize: 24.sp,
-                      fontFamily: 'Roboto',
-                      fontWeight: FontWeight.w700,
+                  child: Obx(
+                    () => Text(
+                      userController.user.value!.firstName,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: AppColor.textColor,
+                        fontSize: 24.sp,
+                        fontFamily: 'Roboto',
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
                   ),
                 ),
                 SizedBox(height: 8.h),
                 SizedBox(
                   width: 200.w,
-                  child: Text(
-                    'Planvilla, Connecticut, USA',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: AppColor.hintTextColor,
-                      fontSize: 14.sp,
-                      fontFamily: 'Roboto',
-                      fontWeight: FontWeight.w400,
+                  child: Obx(
+                    () => Text(
+                      userController.user.value!.address1 ?? 'Address : N/A',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: AppColor.hintTextColor,
+                        fontSize: 14.sp,
+                        fontFamily: 'Roboto',
+                        fontWeight: FontWeight.w400,
+                      ),
                     ),
                   ),
                 ),
@@ -625,8 +633,7 @@ class SettingsView extends GetView<SettingsController> {
                 child: _buildDialogButton(
                   label: 'Logout',
                   onTap: () {
-                    // e.g., authController.logout();
-
+                    AuthPrefsService().removeToken();
                     Get.offAll(SplashView());
                   },
                   bgColor: const Color(0xFFF24646),

@@ -135,7 +135,7 @@ class NetworkCallerService {
   /// OPERATIONS
   ///
   //
-  Future<NetworkResponseModel> getCall(String uri) {
+  Future<NetworkResponseModel> getCall(String uri, bool isAuthRequired) {
     return _request(method: 'GET', uri: uri);
   }
 
